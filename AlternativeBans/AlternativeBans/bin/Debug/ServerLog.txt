@@ -1,0 +1,66 @@
+[09/10/21 14:28:01] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[09/10/21 14:28:01] [Server API] Verbose: 	Command line: "C:\Users\Rustl\Desktop\TShock4.5.4_Terraria1.4.2.3\TerrariaServer.exe" 
+[09/10/21 14:28:01] [Server API] Verbose: 	OS: Microsoft Windows NT 6.2.9200.0 (64bit: True)
+[09/10/21 14:28:01] [Server API] Verbose: 	Mono: False
+[09/10/21 14:28:01] [Server API] Error: Startup aborted due to an exception in the Server API initialization:
+System.InvalidOperationException: Failed to load assembly "AlternativeBans.dll". ---> System.InvalidOperationException: Could not create an instance of plugin class "AlternativeBans.Plugin". ---> System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation. ---> System.TypeInitializationException: The type initializer for 'AlternativeBans.Plugin' threw an exception. ---> System.NullReferenceException: Object reference not set to an instance of an object.
+   at AlternativeBans.Plugin..cctor()
+   --- End of inner exception stack trace ---
+   at AlternativeBans.Plugin..ctor(Main game)
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor)
+   at System.Reflection.RuntimeConstructorInfo.Invoke(BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.RuntimeType.CreateInstanceImpl(BindingFlags bindingAttr, Binder binder, Object[] args, CultureInfo culture, Object[] activationAttributes, StackCrawlMark& stackMark)
+   at System.Activator.CreateInstance(Type type, BindingFlags bindingAttr, Binder binder, Object[] args, CultureInfo culture, Object[] activationAttributes)
+   at System.Activator.CreateInstance(Type type, Object[] args)
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 350
+   --- End of inner exception stack trace ---
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 358
+   --- End of inner exception stack trace ---
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 367
+   at TerrariaApi.Server.ServerApi.Initialize(String[] commandLineArgs, Main game) in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 116
+   at TerrariaApi.Server.HookManager.InitialiseAPI() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\HookManager.cs:line 28
+[09/10/21 14:28:33] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[09/10/21 14:28:33] [Server API] Verbose: 	Command line: "C:\Users\Rustl\Desktop\TShock4.5.4_Terraria1.4.2.3\TerrariaServer.exe" 
+[09/10/21 14:28:33] [Server API] Verbose: 	OS: Microsoft Windows NT 6.2.9200.0 (64bit: True)
+[09/10/21 14:28:33] [Server API] Verbose: 	Mono: False
+[09/10/21 14:28:33] [Server API] Error: Startup aborted due to an exception in the Server API initialization:
+System.InvalidOperationException: Failed to load assembly "AlternativeBans.dll". ---> System.InvalidOperationException: Could not create an instance of plugin class "AlternativeBans.Plugin". ---> System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation. ---> System.TypeInitializationException: The type initializer for 'AlternativeBans.Plugin' threw an exception. ---> System.NullReferenceException: Object reference not set to an instance of an object.
+   at AlternativeBans.Plugin..cctor()
+   --- End of inner exception stack trace ---
+   at AlternativeBans.Plugin..ctor(Main game)
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor)
+   at System.Reflection.RuntimeConstructorInfo.Invoke(BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.RuntimeType.CreateInstanceImpl(BindingFlags bindingAttr, Binder binder, Object[] args, CultureInfo culture, Object[] activationAttributes, StackCrawlMark& stackMark)
+   at System.Activator.CreateInstance(Type type, BindingFlags bindingAttr, Binder binder, Object[] args, CultureInfo culture, Object[] activationAttributes)
+   at System.Activator.CreateInstance(Type type, Object[] args)
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 350
+   --- End of inner exception stack trace ---
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 358
+   --- End of inner exception stack trace ---
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 367
+   at TerrariaApi.Server.ServerApi.Initialize(String[] commandLineArgs, Main game) in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 116
+   at TerrariaApi.Server.HookManager.InitialiseAPI() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\HookManager.cs:line 28
+[09/10/21 14:28:46] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[09/10/21 14:28:46] [Server API] Verbose: 	Command line: "C:\Users\Rustl\Desktop\TShock4.5.4_Terraria1.4.2.3\TerrariaServer.exe" 
+[09/10/21 14:28:46] [Server API] Verbose: 	OS: Microsoft Windows NT 6.2.9200.0 (64bit: True)
+[09/10/21 14:28:46] [Server API] Verbose: 	Mono: False
+[09/10/21 14:28:46] [Server API] Error: Startup aborted due to an exception in the Server API initialization:
+System.InvalidOperationException: Failed to load assembly "AlternativeBans.dll". ---> System.InvalidOperationException: Could not create an instance of plugin class "AlternativeBans.Plugin". ---> System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation. ---> System.TypeInitializationException: The type initializer for 'AlternativeBans.Plugin' threw an exception. ---> System.NullReferenceException: Object reference not set to an instance of an object.
+   at AlternativeBans.Plugin..cctor()
+   --- End of inner exception stack trace ---
+   at AlternativeBans.Plugin..ctor(Main game)
+   --- End of inner exception stack trace ---
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor)
+   at System.Reflection.RuntimeConstructorInfo.Invoke(BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.RuntimeType.CreateInstanceImpl(BindingFlags bindingAttr, Binder binder, Object[] args, CultureInfo culture, Object[] activationAttributes, StackCrawlMark& stackMark)
+   at System.Activator.CreateInstance(Type type, BindingFlags bindingAttr, Binder binder, Object[] args, CultureInfo culture, Object[] activationAttributes)
+   at System.Activator.CreateInstance(Type type, Object[] args)
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 350
+   --- End of inner exception stack trace ---
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 358
+   --- End of inner exception stack trace ---
+   at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 367
+   at TerrariaApi.Server.ServerApi.Initialize(String[] commandLineArgs, Main game) in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 116
+   at TerrariaApi.Server.HookManager.InitialiseAPI() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\HookManager.cs:line 28

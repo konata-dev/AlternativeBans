@@ -1,0 +1,16 @@
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\obj\Debug\AlternativeBans.csproj.CoreCompileInputs.cache
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\AlternativeBans.dll
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\AlternativeBans.pdb
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\Mono.Data.Sqlite.dll
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\MySql.Data.dll
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\Newtonsoft.Json.dll
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\OTAPI.dll
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\TerrariaServer.exe
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\TShockAPI.dll
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\Newtonsoft.Json.xml
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\OTAPI.pdb
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\bin\Debug\TerrariaServer.pdb
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\obj\Debug\AlternativeBans.csproj.CopyComplete
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\obj\Debug\AlternativeBans.dll
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\obj\Debug\AlternativeBans.pdb
+G:\Github\AlternativeBans\AlternativeBans\AlternativeBans\obj\Debug\AlternativeBans.csproj.AssemblyReference.cache
