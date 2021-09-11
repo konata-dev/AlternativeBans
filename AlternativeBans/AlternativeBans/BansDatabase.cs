@@ -21,15 +21,15 @@ namespace AlternativeBans
         {
 			if (TShock.Config.Settings.StorageType.Equals("mysql", StringComparison.OrdinalIgnoreCase))
 			{
-				string[] host = TShock.Config.Settings.MySqlHost.Split(':');
+				string[] host = PluginMain.Config.SQLHost.Split(':');
 				_db = new MySqlConnection()
 				{
 					ConnectionString = String.Format("Server={0}; Port={1}; Database={2}; Uid={3}; Pwd={4};",
 					host[0],
 					host.Length == 1 ? "3306" : host[1],
-					TShock.Config.Settings.MySqlDbName,
-					TShock.Config.Settings.MySqlUsername,
-					TShock.Config.Settings.MySqlPassword)
+					PluginMain.Config.SQLDatabaseName,
+					PluginMain.Config.SQLUsername,
+					PluginMain.Config. SQLPassword)
 				};
 			}
 			else if (TShock.Config.Settings.StorageType.Equals("sqlite", StringComparison.OrdinalIgnoreCase))
@@ -53,7 +53,82 @@ namespace AlternativeBans
 				));
 		}
 
-		internal void ConvertBansOld()
+		internal void ConvertWeirdoBans()
+        {
+			try
+            {
+				var weirdoBans = TShock.Bans.Bans;
+				var dates = new List<DateTime>();
+
+				foreach (var ban in weirdoBans) // pepega
+                {
+					if (!dates.Contains(ban.Value.BanDateTime))
+						dates.Add(ban.Value.BanDateTime);
+                }
+
+				AltBan newBan = null;
+
+				foreach (var date in dates) // in theory, you can get the original bans by comparing dates as the chances of 2 people being banned in the same second is tiny
+                {
+					var bans = weirdoBans.Values.Where(b => b.BanDateTime == date);
+
+					foreach (var ban in bans)
+                    {
+						if (newBan == null)
+						{
+							newBan = new AltBan()
+							{
+								BanDate = ban.BanDateTime,
+								Author = ban.BanningUser,
+								Expiration = ban.ExpirationDateTime,
+								Reason = ban.Reason,
+								Server = "all",
+								AccountName = "",
+								IP = "",
+								Name = "",
+								UUID = ""
+							};
+						}
+
+						var identifier = ban.Identifier.Split(':');
+
+						switch (identifier[0])
+                        {
+							case "acc":
+								newBan.AccountName = identifier[1];
+								break;
+
+							case "ip":
+								newBan.IP = identifier[1];
+								break;
+
+							case "uuid":
+								newBan.UUID = identifier[1];
+								break;
+
+							case "name":
+								newBan.Name = identifier[1];
+								break;
+                        }
+                    }
+
+					AddBan(newBan);
+					newBan = null;
+                }
+
+				if (TShock.Config.Settings.StorageType == "mysql")
+					_db.Query("ALTER TABLE playerbans RENAME TO playerbansbackup;");
+				else
+					TShock.Log.ConsoleError("You are not using sqlite. You will need to manually rename ''playerbans'' to ''playerbansbackup'' or something" +
+						"\nYOU NEED TO DO THIS OR TSHOCKS BANS WILL STILL BE PRESENT. Google how to do it or ping rusty#1000 on the tshock discord.");
+            }
+			catch (Exception ex)
+            {
+				TShock.Log.ConsoleError(ex.ToString());
+            }
+        }
+
+		internal void ConvertBansT1()
         {
 			try
             {
@@ -112,7 +187,7 @@ namespace AlternativeBans
 					actualDate = date.Value;
 
 				if (_db.Query("INSERT INTO altbans (name, accountname, reason, author, uuid, expiration, date, ip, server) VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8)",
-					name, accountName, reason, author, uuid, expiration.ToString("s"), actualDate.ToString("s"), ip, server) == 1)
+					name, accountName, reason, author, uuid, expiration.ToString("s"), actualDate.ToString("s"), ip, server.ToLowerInvariant()) == 1)
 					return true;
             }
 			catch (Exception ex)

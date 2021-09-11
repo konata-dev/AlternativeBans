@@ -86,7 +86,7 @@ namespace AlternativeBans
 			var length = DateTime.MaxValue; //ban add user server time reason
 			var server = "all";
 			var reason = "No reason specified";
-			var identifier = args.Parameters[1].ToLowerInvariant();
+			var identifier = args.Parameters[1];
 			var hasTime = false;
 			var hasServer = false;
 
@@ -105,7 +105,7 @@ namespace AlternativeBans
 				}
 				else
                 {
-					reason = string.Join(" ", args.Parameters.Skip(i + 1));
+					reason = string.Join(" ", args.Parameters.Skip(i));
 					break;
 				}
 			}
@@ -136,7 +136,7 @@ namespace AlternativeBans
                     {
 						if (Bans.AddBan(args.Player.Name, reason, length, server, "", identifier, "", ""))
                         {
-							BanDisconnect(TShock.Players.FirstOrDefault(p => p != null && p.Name.ToLowerInvariant() == identifier), reason, length);
+							BanDisconnect(TShock.Players.FirstOrDefault(p => p != null && p.Name == identifier), reason, length);
 							args.Player.SendSuccessMessage("Banned joining with the name {0}.", identifier);
 						}
 						else
@@ -161,7 +161,8 @@ namespace AlternativeBans
 						if (Bans.AddBan(args.Player.Name, reason, length, server, "", "", isIp ? identifier : 
 							JsonConvert.DeserializeObject<List<string>>(account.KnownIps).Last(), ""))
                         {
-							BanDisconnect(TShock.Players.FirstOrDefault(p => p != null && p.IP == identifier || (p.IsLoggedIn && p.Account.ID == account.ID)), reason, length);
+							BanDisconnect(TShock.Players.FirstOrDefault(p => p != null && p.IP == identifier || (p.Account != null && account != null
+							&& p.Account.ID == account.ID)), reason, length);
 							args.Player.SendSuccessMessage("Banned {0}.", isIp ? identifier : string.Format("{0}'s IP.", account.Name));
 						}
 						else
@@ -244,6 +245,18 @@ namespace AlternativeBans
 					break;
             }
 		}
+
+		private void ConvertCMD(CommandArgs args)
+        {
+			if (args.Player is TSServerPlayer)
+			{
+				args.Player.SendSuccessMessage("Starting conversion...");
+				Bans.ConvertWeirdoBans();
+				args.Player.SendSuccessMessage("Converted.");
+			}
+			else
+				args.Player.SendErrorMessage("This command is only accessible in console.");
+        }
 
 		private void AltBanCMD(CommandArgs args)
         {
@@ -394,7 +407,7 @@ namespace AlternativeBans
 							|| ban.Server.ToLowerInvariant() == identifier || ban.ID.ToString() == identifier || ban.Name.ToLowerInvariant().StartsWith(identifier)
 							|| (date != DateTime.MaxValue && date.Day == ban.BanDate.Day && date.Month == ban.BanDate.Month && date.Year == ban.BanDate.Year));
 
-						if (sortedBans.Count() > 10 && !(args.Player is TSServerPlayer))
+						if (sortedBans.Count() > 10 && args.Player.RealPlayer)
                         {
 							args.Player.SendErrorMessage("More than 10 bans found, please execute via Discord/console.");
 							return;
@@ -404,7 +417,7 @@ namespace AlternativeBans
                         {
 							var str = ban.ToString();
 
-							if ((output + str).Length > 2000)
+							if ((output + str).Length > 1000)
                             {
 								args.Player.SendMessage(output, Color.CornflowerBlue);
 								output = "";
@@ -481,7 +494,7 @@ namespace AlternativeBans
 							return;
 						}
 
-						var ban = Bans.GetBan("", "", "", account.Name);
+						var ban = Bans.GetBan(null, null, null, account.Name);
 
 						if (ban == null)
                         {
@@ -505,9 +518,9 @@ namespace AlternativeBans
 		private void OnPostLogin(TShockAPI.Hooks.PlayerPostLoginEventArgs args)
         {
 			var player = args.Player;
-			var ban = Bans.GetBan("", "", "", player.Account.Name);
+			var ban = Bans.GetBan(null, null, null, player.Account.Name);
 
-			if (ban != null && (!Config.UseDimensions || ban.Server == Config.DimensionName.ToLowerInvariant()))
+			if (ban != null && (!Config.UseDimensions || ban.Server == Config.DimensionName.ToLowerInvariant() || ban.Server == "all"))
 			{
 				if (DateTime.UtcNow >= ban.Expiration)
 					Bans.DeleteBan(ban.ID.ToString());
@@ -518,11 +531,14 @@ namespace AlternativeBans
 
 		private void OnTShockInit()
         {
-			Bans = new BansDatabase();
 			Config = BanConfig.Read();
+			Bans = new BansDatabase();
 
 			TShockAPI.Hooks.PlayerHooks.PlayerPostLogin += OnPostLogin;
 			Commands.ChatCommands.Find(c => c.Name == "ban").CommandDelegate = AltBanCMD;
+
+			if (!Config.DisableConvertCommand)
+				Commands.ChatCommands.Add(new Command("altbans.dev.convert", ConvertCMD, "converttshockbans"));
         }
 
         private void OnJoin(JoinEventArgs args)
@@ -532,9 +548,9 @@ namespace AlternativeBans
 			if (player == null)
 				return;
 
-			var ban = Bans.GetBan(player.UUID, player.IP, player.Name);
+			var ban = Bans.GetBan(player.UUID, player.IP, string.IsNullOrWhiteSpace(player.Name) ? null : player.Name);
 
-			if (ban != null && (!Config.UseDimensions || ban.Server == Config.DimensionName.ToLowerInvariant()))
+			if (ban != null && (!Config.UseDimensions || ban.Server == Config.DimensionName.ToLowerInvariant() || ban.Server == "all"))
             {
 				if (DateTime.UtcNow >= ban.Expiration)
 					Bans.DeleteBan(ban.ID.ToString());

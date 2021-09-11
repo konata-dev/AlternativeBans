@@ -64,3 +64,17 @@ System.InvalidOperationException: Failed to load assembly "AlternativeBans.dll".
    at TerrariaApi.Server.ServerApi.LoadPlugins() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 367
    at TerrariaApi.Server.ServerApi.Initialize(String[] commandLineArgs, Main game) in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\ServerApi.cs:line 116
    at TerrariaApi.Server.HookManager.InitialiseAPI() in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\HookManager.cs:line 28
+[09/10/21 22:29:27] [Server API] Verbose: TerrariaApi - Server v2.1.0.0 started.
+[09/10/21 22:29:27] [Server API] Verbose: 	Command line: "C:\Users\Rustl\Desktop\TShock4.5.4_Terraria1.4.2.3\TerrariaServer.exe" 
+[09/10/21 22:29:27] [Server API] Verbose: 	OS: Microsoft Windows NT 6.2.9200.0 (64bit: True)
+[09/10/21 22:29:27] [Server API] Verbose: 	Mono: False
+[09/10/21 22:29:27] [Server API] Info: Plugin Alternative Bans v1.0 (by rusty) initiated.
+[09/10/21 22:29:28] [Server API] Info: Plugin TShock v4.5.4.0 (by The TShock Team) initiated.
+[09/10/21 22:29:28] [Server API] Info: Plugin CurrenCy Bank v1.69 (by None) initiated.
+[09/10/21 22:29:28] [Server API] Info: Plugin CustomItems v1.0.0.1 (by Johuan) initiated.
+[09/10/21 22:29:28] [Server API] Info: Plugin Modern Housing v1.0 (by rustly) initiated.
+[09/10/21 22:29:28] [Server API] Info: Plugin WorldEdit v1.7.4.0 (by Nyx Studios, massive upgrade by Anzhelika) initiated.
+[09/10/21 22:29:28] [Server API] Warning: Plugin "WorldEdit" has had an unhandled exception thrown by one of its GameInitialize handlers: 
+System.MissingMethodException: Method not found: 'TShockAPI.ConfigFile TShockAPI.TShock.get_Config()'.
+   at WorldEdit.WorldEdit.OnInitialize(EventArgs e)
+   at TerrariaApi.Server.HandlerCollection`1.Invoke(ArgsType args) in D:\a\TShock\TShock\TerrariaServerAPI\TerrariaServerAPI\TerrariaApi.Server\HandlerCollection.cs:line 109
