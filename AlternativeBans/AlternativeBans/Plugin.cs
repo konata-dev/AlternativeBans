@@ -11,6 +11,7 @@ using System.Timers;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
+using static AlternativeBans.BansDatabase;
 
 namespace AlternativeBans
 {
@@ -27,6 +28,8 @@ namespace AlternativeBans
 
 		public static BanConfig Config { get; private set; }
 
+		private static readonly string[] _lastListIdentifier = new string[Main.maxPlayers];
+
         public PluginMain(Main game) : base(game)
         {
 			Order = -1;
@@ -34,10 +37,8 @@ namespace AlternativeBans
 
         public override void Initialize()
         {
-
 			ServerApi.Hooks.ServerJoin.Register(this, OnJoin);
 			TShock.Initialized += OnTShockInit;
-
 		}
 
         protected override void Dispose(bool disposing)
@@ -47,6 +48,7 @@ namespace AlternativeBans
 
 				ServerApi.Hooks.ServerJoin.Deregister(this, OnJoin);
 				TShock.Initialized -= OnTShockInit;
+				TShockAPI.Hooks.GeneralHooks.ReloadEvent -= OnReload;
 				TShockAPI.Hooks.PlayerHooks.PlayerPostLogin -= OnPostLogin;
 			}
 
@@ -64,6 +66,8 @@ namespace AlternativeBans
 				date += string.Format("{0} hour{1} ", span.Hours, span.Hours == 1 ? "" : "s");
 			if (span.Minutes > 0)
 				date += string.Format("{0} minute{1} ", span.Minutes, span.Minutes == 1 ? "" : "s");
+			if (span.Seconds > 0)
+				date += string.Format("{0} second{1} ", span.Seconds, span.Seconds == 1 ? "" : "s");
 
 			return date.Remove(date.Length - 1);
 		}
@@ -92,7 +96,6 @@ namespace AlternativeBans
 
 			for (int i = 2; i < args.Parameters.Count; i++)
             {
-				Console.WriteLine(args.Parameters[i]);
 				if (!hasServer && Config.UseDimensions && Config.BannableDimensions.Any(s => s.ToLowerInvariant() == args.Parameters[i].ToLowerInvariant()))
 				{
 					server = args.Parameters[i].ToLowerInvariant();
@@ -394,40 +397,87 @@ namespace AlternativeBans
 				case "list":
 				case "l":
                     {
+						if (args.Player is TSServerPlayer)
+                        {
+							args.Player.SendErrorMessage("Listing does not work in console.");
+							return;
+                        }
+
 						var bans = Bans.GetBans();
-						var identifier = args.Parameters.Count == 1 ? string.Join(" ", args.Parameters.Skip(1)).ToLowerInvariant() : null;
 						var date = DateTime.MaxValue;
+						string identifier = null;
+						var page = 1;
+
+						if (args.Player.RealPlayer)
+						{
+							if (args.Parameters.Count > 1 && _lastListIdentifier[args.Player.Index] != string.Join(" ", args.Parameters.Skip(1)))
+								identifier = _lastListIdentifier[args.Player.Index] = string.Join(" ", args.Parameters.Skip(1));
+							else
+							{
+								identifier = _lastListIdentifier[args.Player.Index];
+								if (args.Parameters.Count == 2 && int.TryParse(args.Parameters[1], out var i))
+									page = i;
+							}
+						}
+						else // awful
+                        {
+							if (args.Parameters.Count > 2)
+							{
+								if (int.TryParse(args.Parameters[1], out var i))
+									page = i;
+								else
+								{
+									args.Player.SendErrorMessage("Page must be a number.");
+									return;
+								}
+
+								identifier = string.Join(" ", args.Parameters.Skip(2));
+							}
+                        }
 
 						if (identifier != null && !DateTime.TryParse(identifier, out date))
 							date = DateTime.MaxValue;
 
-						var output = "";
-						var sortedBans = identifier == null ? bans : bans.Where(ban => ban.AccountName.ToLowerInvariant().StartsWith(identifier)
-							|| ban.Author.ToLowerInvariant().StartsWith(identifier) || ban.IP == identifier || ban.UUID == identifier 
-							|| ban.Server.ToLowerInvariant() == identifier || ban.ID.ToString() == identifier || ban.Name.ToLowerInvariant().StartsWith(identifier)
-							|| (date != DateTime.MaxValue && date.Day == ban.BanDate.Day && date.Month == ban.BanDate.Month && date.Year == ban.BanDate.Year));
+						var sortedBans = identifier == null ? bans : bans.FindAll(ban => ban != null &&
+							((ban.AccountName != null && ban.AccountName.ToLowerInvariant().StartsWith(identifier.ToLowerInvariant()))
+							|| (ban.Author != null && ban.Author.ToLowerInvariant().StartsWith(identifier.ToLowerInvariant()))
+							|| ban.IP == identifier
+							|| ban.UUID == identifier
+							|| (ban.Server != null && ban.Server.ToLowerInvariant() == identifier.ToLowerInvariant())
+							|| ban.ID.ToString() == identifier
+							|| (ban.Name != null && ban.Name.ToLowerInvariant().StartsWith(identifier.ToLowerInvariant()))
+							|| (date != DateTime.MaxValue && date.Day == ban.BanDate.Day && date.Month == ban.BanDate.Month && date.Year == ban.BanDate.Year)));
 
-						if (sortedBans.Count() > 10 && args.Player.RealPlayer)
-                        {
-							args.Player.SendErrorMessage("More than 10 bans found, please execute via Discord/console.");
-							return;
-                        }
-
-						foreach (var ban in sortedBans)
-                        {
-							var str = ban.ToString();
-
-							if ((output + str).Length > 1000)
-                            {
-								args.Player.SendMessage(output, Color.CornflowerBlue);
-								output = "";
+						if (Config.DeleteExpiredBansFoundInListCommand)
+						{
+							foreach (var ban in sortedBans.ToList())
+							{
+								if (DateTime.UtcNow >= ban.Expiration)
+                                {
+									sortedBans.Remove(ban);
+									Bans.DeleteBan(ban.ID);
+								}
 							}
+						}
 
-							output += string.Format("{0}{1}", str, sortedBans.Count() == 1 ? "" : "\n");
-                        } 
-						
-						if (output != "")
-							args.Player.SendMessage(output, Color.CornflowerBlue);
+						var settings = new PaginationTools.Settings()
+						{
+							HeaderFormat = "Ban list {0}/{1}",
+							FooterFormat = "Type /ban list {0} for more.",
+							NothingToDisplayString = "No bans.",
+							MaxLinesPerPage = args.Player.RealPlayer ? Config.MaxBansPerPageIngame : Config.MaxBansPerPageDiscord,
+						};
+
+						if (!args.Player.RealPlayer)
+							settings.LineFormatter = (line, ix, p) =>
+							{
+								if (ix == 0)
+									return new Tuple<string, Color>(string.Format("{0}```", line), Color.Yellow);
+
+								return new Tuple<string, Color>(string.Format("```{0}```", line), Color.Yellow);
+							};
+
+						PaginationTools.SendPage(args.Player, page, sortedBans, settings);
 					}
 					break;
 
@@ -515,26 +565,54 @@ namespace AlternativeBans
             }
         }
 
+		private void OnReload(TShockAPI.Hooks.ReloadEventArgs args)
+        {
+			Config = BanConfig.Read();
+			args.Player.SendSuccessMessage("Reloaded AltBans config.");
+        }
+
 		private void OnPostLogin(TShockAPI.Hooks.PlayerPostLoginEventArgs args)
         {
 			var player = args.Player;
-			var ban = Bans.GetBan(null, null, null, player.Account.Name);
+			var bans = Bans.GetBans(player.UUID, player.IP, string.IsNullOrWhiteSpace(player.Name) ? null : player.Name, player.Account.Name);
+			var newestBanDate = DateTime.MinValue;
+			AltBan newestBan = null;
 
-			if (ban != null && (!Config.UseDimensions || ban.Server == Config.DimensionName.ToLowerInvariant() || ban.Server == "all"))
+			foreach (var ban in bans)
 			{
 				if (DateTime.UtcNow >= ban.Expiration)
-					Bans.DeleteBan(ban.ID.ToString());
-				else
-					BanDisconnect(args.Player, ban.Reason, ban.Expiration, ban.ID);
+				{
+					Bans.DeleteBan(ban.ID);
+					continue;
+				}
+
+				if (ban.BanDate >= newestBanDate && (!Config.UseDimensions || ban.Server == "all" || ban.Server == Config.DimensionName))
+				{
+					newestBan = ban;
+					newestBanDate = ban.BanDate;
+				}
 			}
+
+			if (newestBan != null)
+				BanDisconnect(player, newestBan.Reason, newestBan.Expiration, newestBan.ID);
 		}
 
 		private void OnTShockInit()
-        {
+		{
 			Config = BanConfig.Read();
 			Bans = new BansDatabase();
 
+			if (Config.DeleteExpiredBansOnServerStart)
+			{
+				foreach (var ban in Bans.GetBans())
+				{
+					if (DateTime.UtcNow >= ban.Expiration)
+						Bans.DeleteBan(ban.ID);
+				}
+			}
+
 			TShockAPI.Hooks.PlayerHooks.PlayerPostLogin += OnPostLogin;
+			TShockAPI.Hooks.GeneralHooks.ReloadEvent += OnReload;
 			Commands.ChatCommands.Find(c => c.Name == "ban").CommandDelegate = AltBanCMD;
 
 			if (!Config.DisableConvertCommand)
@@ -548,18 +626,30 @@ namespace AlternativeBans
 			if (player == null)
 				return;
 
-			var ban = Bans.GetBan(player.UUID, player.IP, string.IsNullOrWhiteSpace(player.Name) ? null : player.Name);
-
-			if (ban != null && (!Config.UseDimensions || ban.Server == Config.DimensionName.ToLowerInvariant() || ban.Server == "all"))
+			var bans = Bans.GetBans(player.UUID, player.IP, string.IsNullOrWhiteSpace(player.Name) ? null : player.Name);
+			var newestBanDate = DateTime.MinValue;
+			AltBan newestBan = null;
+			
+			foreach (var ban in bans)
             {
 				if (DateTime.UtcNow >= ban.Expiration)
-					Bans.DeleteBan(ban.ID.ToString());
-				else
                 {
-					BanDisconnect(player, ban.Reason, ban.Expiration, ban.ID);
-					args.Handled = true;
-				}
-			}
+					Bans.DeleteBan(ban.ID);
+					continue;
+                }
+
+				if (ban.BanDate >= newestBanDate && (!Config.UseDimensions || ban.Server == "all" || ban.Server == Config.DimensionName))
+                {
+					newestBan = ban;
+					newestBanDate = ban.BanDate;
+                }
+            }
+
+			if (newestBan != null)
+            {
+				BanDisconnect(player, newestBan.Reason, newestBan.Expiration, newestBan.ID);
+				args.Handled = true;
+            }
         }
 
 		private enum AltBanCMD_IdentifierType

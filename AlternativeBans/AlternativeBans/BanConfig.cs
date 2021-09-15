@@ -14,6 +14,14 @@ namespace AlternativeBans
 
         public bool DisableConvertCommand { get; set; }
 
+        public bool DeleteExpiredBansOnServerStart { get; set; } = true;
+
+        public bool DeleteExpiredBansFoundInListCommand { get; set; } = true;
+
+        public int MaxBansPerPageIngame { get; set; } = 8;
+
+        public int MaxBansPerPageDiscord { get; set; } = 100;
+
         public List<string> BannableDimensions { get; set; }
 
         public string DimensionName { get; set; } = "server";

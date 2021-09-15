@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
 using TShockAPI;
 using TShockAPI.DB;
 
@@ -292,6 +293,41 @@ namespace AlternativeBans
 			return null;
 		}
 
+		public List<AltBan> GetBans(string uuid, string ip = null, string name = null, string accountName = null)
+        {
+			var output = new List<AltBan>();
+
+			try
+			{
+				using (var reader = _db.QueryReader("SELECT * FROM altbans WHERE name = @0 OR accountname = @1 OR uuid = @2 OR ip = @3", name,
+					accountName, uuid, ip))
+				{
+					if (reader.Read())
+					{
+						output.Add(new AltBan()
+						{
+							AccountName = reader.Get<string>("accountname"),
+							Author = reader.Get<string>("author"),
+							BanDate = DateTime.Parse(reader.Get<string>("date")),
+							Expiration = DateTime.Parse(reader.Get<string>("expiration")),
+							ID = reader.Get<int>("id"),
+							IP = reader.Get<string>("ip"),
+							Reason = reader.Get<string>("reason"),
+							Name = reader.Get<string>("name"),
+							UUID = reader.Get<string>("uuid"),
+							Server = reader.Get<string>("server")
+						});
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				TShock.Log.ConsoleError(ex.ToString());
+			}
+
+			return output;
+		}
+
 		public AltBan GetBan(string uuid = null, string ip = null, string name = null, string accountName = null)
         {
 			try
@@ -381,8 +417,28 @@ namespace AlternativeBans
 
             public override string ToString()
             {
-				return string.Format("id {0} {1} author {2} acc {3} name {4} ip {5}", ID.Color(Color.MediumSlateBlue), PluginMain.Config.UseDimensions ? ("server " + Server).Color(Color.MediumSlateBlue) 
-					: "", Author.Color(Color.MediumSlateBlue), AccountName.Color(Color.MediumSlateBlue), Name.Color(Color.MediumSlateBlue), IP.Color(Color.MediumSlateBlue));
+                var strs = new List<string>
+                {
+                    string.Format("ID: {0}", ID.Color(Color.Red)),
+                    string.Format("Reason: {0}", Reason.Color(Color.White)),
+                    string.Format("Author: {0}", (string.IsNullOrWhiteSpace(Author) ? "Unknown" : Author).Color(Color.SkyBlue)),
+                    string.Format("Expiration: {0}", (Expiration.Year == 9999 ? "Permanent" : Expiration.ToString("g")).Color(Color.Red)),
+                    string.Format("Date: {0}", BanDate.ToString("g").Color(Color.Red))
+                };
+
+                if (PluginMain.Config.UseDimensions)
+					strs.Add(string.Format("Server: {0}", Server.Color(Color.SkyBlue)));
+
+				if (!string.IsNullOrWhiteSpace(Name))
+					strs.Add(string.Format("Name: {0}", Name.Color(Color.White)));
+
+				if (!string.IsNullOrWhiteSpace(AccountName))
+					strs.Add(string.Format("Account: {0}", AccountName.Color(Color.White)));
+
+				if (!string.IsNullOrWhiteSpace(IP))
+					strs.Add(string.Format("IP: {0}", IP.Color(Color.White)));
+
+				return string.Join(", ", strs);
             }
         }
 	}
