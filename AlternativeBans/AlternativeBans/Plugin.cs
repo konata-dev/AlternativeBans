@@ -97,7 +97,7 @@ namespace AlternativeBans
                     server = args.Parameters[i].ToLowerInvariant();
                     hasServer = true;
                 }
-                else if (!hasTime && TShock.Utils.TryParseTime(args.Parameters[i], out var seconds))
+                else if (!hasTime && TShock.Utils.TryParseTime(args.Parameters[i], out ulong seconds))
                 {
                     length = DateTime.UtcNow.AddSeconds(seconds);
                     hasTime = true;
