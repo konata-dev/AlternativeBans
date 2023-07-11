@@ -8,5 +8,6 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="TShock" Version="5.2.0" />
+    <PackageReference Include="TBC.Extensions.Auxiliary" Version="1.2.0" />
   </ItemGroup>
 </Project>
