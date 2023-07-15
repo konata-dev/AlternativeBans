@@ -83,6 +83,8 @@ namespace AlternativeBans
             if (expiration.Year != 9999)
                 date = "Expires in " + GetBanTime(expiration);
 
+            plr.SendErrorMessage(string.Format("You have been banned{2}.\nReason: {0}\n{1}", reason, date, id == -1 ? "" : ". ID: " + id));
+
             byte[] data = (new PacketFactory())
                     .SetType(67)
                     .PackInt16(2)
@@ -90,8 +92,6 @@ namespace AlternativeBans
                     .GetByteData();
 
             plr.SendRawData(data);
-
-            plr.SendErrorMessage(string.Format("You have been banned{2}.\nReason: {0}\n{1}", reason, date, id == -1 ? "" : ". ID: " + id));
         }
 
         private void HandleBan(CommandArgs args, AltBanCMD_IdentifierType type)
